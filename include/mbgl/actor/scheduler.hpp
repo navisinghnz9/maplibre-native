@@ -39,8 +39,8 @@ public:
     virtual ~Scheduler() = default;
 
     /// Enqueues a function for execution.
-    virtual void schedule(std::function<void()>&&) = 0;
-    virtual void schedule(const util::SimpleIdentity, std::function<void()>&&) = 0;
+    virtual void schedule(std::function<void()>&&) {}
+    virtual void schedule(const util::SimpleIdentity, std::function<void()>&&) {}
 
     /// Makes a weak pointer to this Scheduler.
     virtual mapbox::base::WeakPtr<Scheduler> makeWeakPtr() = 0;
