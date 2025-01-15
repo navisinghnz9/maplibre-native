@@ -13,7 +13,11 @@
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/std.hpp>
 
+#include <mbgl/util/identity.hpp>
+
 #include <cassert>
+
+
 
 namespace mbgl {
 
@@ -26,10 +30,12 @@ struct SpriteLoader::Data {
     std::unique_ptr<AsyncRequest> spriteRequest;
 };
 
-SpriteLoader::SpriteLoader(float pixelRatio_, const TaggedScheduler& threadPool_)
+SpriteLoader::SpriteLoader(float pixelRatio_, __attribute__((unused)) const TaggedScheduler& threadPool_)
     : pixelRatio(pixelRatio_),
       observer(&nullObserver),
-      threadPool(threadPool_) {}
+      threadPool(Scheduler::GetBackground(), uniqueID) {
+      Log::Info(Event::General, "SpriteLoader: Initialized with uniqueID" + util::toString(uniqueID));
+      }
 
 SpriteLoader::~SpriteLoader() = default;
 
@@ -50,14 +56,18 @@ void SpriteLoader::load(const std::optional<style::Sprite> sprite, FileSource& f
         std::lock_guard<std::mutex> lock(dataMapMutex);
         Data* data = dataMap[sprite->id].get();
         if (res.error) {
+            Log::Info(Event::General, "SpriteLoader: res.error"); 
             observer->onSpriteError(*sprite, std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified) {
+            Log::Info(Event::General, "SpriteLoader: res.notModified");  	
             return;
         } else if (res.noContent) {
+            Log::Info(Event::General, "SpriteLoader: res.noContent");  
             data->json = std::make_shared<std::string>();
             emitSpriteLoadedIfComplete(*sprite);
         } else {
             // Only trigger a sprite loaded event we got new data.
+            Log::Info(Event::General, "SpriteLoader: Only trigger a sprite loaded event we got new data");  
             assert(data->json != res.data);
             data->json = std::move(res.data);
             emitSpriteLoadedIfComplete(*sprite);

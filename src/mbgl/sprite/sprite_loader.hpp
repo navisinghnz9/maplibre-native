@@ -33,6 +33,8 @@ private:
     friend class SpriteLoaderWorker;
 
     const float pixelRatio;
+    
+    util::SimpleIdentity uniqueID;
 
     struct Data;
     std::map<std::string, std::unique_ptr<Data>> dataMap;
