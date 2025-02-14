@@ -7,6 +7,7 @@
 #include <functional>
 #include <memory>
 #include <type_traits>
+#include <mbgl/util/logging.hpp>
 
 namespace mbgl {
 
@@ -39,8 +40,13 @@ public:
     virtual ~Scheduler() = default;
 
     /// Enqueues a function for execution.
-    virtual void schedule(std::function<void()>&&) {}
-    virtual void schedule(const util::SimpleIdentity, std::function<void()>&&) {}
+    virtual void schedule(std::function<void()>&&) {
+        Log::Info(Event::General, "[WARNING] :: Scheduler:: schedule(func) : not implemented");
+    }
+
+    virtual void schedule(const util::SimpleIdentity, std::function<void()>&&) {
+        Log::Info(Event::General, "[WARNING] :: Scheduler:: schedule(identity, func) : not implemented");
+    }
 
     /// Makes a weak pointer to this Scheduler.
     virtual mapbox::base::WeakPtr<Scheduler> makeWeakPtr() = 0;
