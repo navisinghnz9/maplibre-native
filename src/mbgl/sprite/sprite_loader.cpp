@@ -31,10 +31,13 @@ struct SpriteLoader::Data {
 };
 
 SpriteLoader::SpriteLoader(float pixelRatio_, __attribute__((unused)) const TaggedScheduler& threadPool_)
+//SpriteLoader::SpriteLoader(float pixelRatio_, const TaggedScheduler& threadPool_)
     : pixelRatio(pixelRatio_),
       observer(&nullObserver),
-      threadPool(Scheduler::GetBackground(), uniqueID) {
-      Log::Info(Event::General, "SpriteLoader: Initialized with uniqueID" + util::toString(uniqueID));
+      //threadPool(threadPool_)
+      threadPool(Scheduler::GetBackground(), uniqueID)
+      {
+        Log::Info(Event::General, "SpriteLoader: Initialized with uniqueID" + util::toString(uniqueID));
       }
 
 SpriteLoader::~SpriteLoader() = default;

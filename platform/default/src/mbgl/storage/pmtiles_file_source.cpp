@@ -81,6 +81,8 @@ public:
     void request_tile(AsyncRequest* req, const Resource& resource, ActorRef<FileSourceRequest> ref) {
         auto url = extract_url(resource.url);
 
+        Log::Info(Event::General, "[PMTilesFileSource::Impl]: request_tile() - getHeader()");
+
         getHeader(url, req, [=, this](std::unique_ptr<Response::Error> error) {
             if (error) {
                 Response response;
@@ -172,21 +174,25 @@ public:
     }
 
     void setResourceOptions(ResourceOptions options) {
+        Log::Info(Event::General, "[PMTilesFileSource::Impl]: setResourceOptions()");
         std::lock_guard<std::mutex> lock(resourceOptionsMutex);
         resourceOptions = options;
     }
 
     ResourceOptions getResourceOptions() {
+        Log::Info(Event::General, "[PMTilesFileSource::Impl]: getResourceOptions()");
         std::lock_guard<std::mutex> lock(resourceOptionsMutex);
         return resourceOptions.clone();
     }
 
     void setClientOptions(ClientOptions options) {
+        Log::Info(Event::General, "[PMTilesFileSource::Impl]: setClientOptions()");
         std::lock_guard<std::mutex> lock(clientOptionsMutex);
         clientOptions = options;
     }
 
     ClientOptions getClientOptions() {
+        Log::Info(Event::General, "[PMTilesFileSource::Impl]: getClientOptions()");
         std::lock_guard<std::mutex> lock(clientOptionsMutex);
         return clientOptions.clone();
     }
@@ -545,10 +551,14 @@ PMTilesFileSource::PMTilesFileSource(const ResourceOptions& resourceOptions, con
           util::makeThreadPrioritySetter(platform::EXPERIMENTAL_THREAD_PRIORITY_FILE),
           "PMTilesFileSource",
           resourceOptions.clone(),
-          clientOptions.clone())) {}
+          clientOptions.clone())) {
+      Log::Info(Event::General, "[PMTilesFileSource]: PMTilesFileSource()");
+}
 
 std::unique_ptr<AsyncRequest> PMTilesFileSource::request(const Resource& resource, FileSource::Callback callback) {
     auto req = std::make_unique<FileSourceRequest>(std::move(callback));
+
+    Log::Info(Event::General, "[PMTilesFileSource]: request()");
 
     // assume if there is a tile request, that the pmtiles file has been validated
     if (resource.kind == Resource::Tile) {
@@ -558,6 +568,7 @@ std::unique_ptr<AsyncRequest> PMTilesFileSource::request(const Resource& resourc
 
     // return TileJSON
     thread->actor().invoke(&Impl::request_tilejson, req.get(), resource, req->actor());
+    Log::Info(Event::General, "[PMTilesFileSource]: request() returning TileJSON");
     return req;
 }
 
